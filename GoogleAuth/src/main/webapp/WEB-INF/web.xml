@@ -1,3 +1,6 @@
 <session-config>
     <tracking-mode>COOKIE</tracking-mode>
+    <listener>
+    	<listener-class>com.mysite.MySpecialListener</listener-class>
+	</listener>
 </session-config>

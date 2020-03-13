@@ -6,8 +6,7 @@
 <meta name="google-signin-client_id"
 	content="37858416227-7ogd24in3t5of5o5ugqkpefhvehjbbgi.apps.googleusercontent.com">
 	<script src="https://apis.google.com/js/platform.js" defer></script>
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.js"></script>
+<link rel="shortcut icon" href="~/favicon.ico">>
 
 
 
@@ -22,15 +21,16 @@
 		Me!</button>
 	<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" data-longtitle="true"></div>
 	<button type="button" id="signOutButton" onclick="signOut()" disabled>Sign Out</button>
-
-
-
+	<br>
+   <label for="usrname">Username</label>
+    <input type="text" id="usrname" name="usrname" required>
+    <label for="psw">Password</label>
+    <input type="password" id="psw" name="psw" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>
+	<button type="button" id="signInButton" onclick="onSignIn2()" >Sign In</button>
 
 
 
 	<script>
-
-	
 		function myFunction(p1, p2) {
 			return p1 * p2;
 		}
@@ -55,10 +55,41 @@
 			var xhr = new XMLHttpRequest();
         	xhr.open('POST', 'GoogleAuth');
         	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        	xhr.onload = function() {
-        		console.log('Signed in as: ' + xhr.responseText + ":");  
-        	};
+        	//xhr.onload = function() {
+        	//	console.log('Signed in as: ' + xhr.responseText + ":");  
+        	//};
         	xhr.send('id_token=' + id_token);
+		    console.log('onSignIn complete');
+		}
+		function onSignIn2() {
+			// Useful data for your client-side scripts:
+			console.log("usrname: " + document.getElementById("usrname").value);
+			console.log("psw: " + document.getElementById("psw").value);
+			if( document.getElementById("psw").value == "" )
+				{
+				alert("Must enter a password");
+				}
+			else if( document.getElementById("usrname").value == "" )
+				{
+				alert("Must enter a usrname");
+				}
+			else
+				{
+				document.getElementById("signOutButton").disabled = false;
+				document.getElementById("signInButton").disabled = true;
+
+				var xhr = new XMLHttpRequest();
+	        	xhr.open('POST', 'UserDataAuth');
+	        	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	        	xhr.onload = function() {
+	        		console.log('Signed in as: ' + xhr.responseText + ":");  
+	        	};
+	        	xhr.send('username=' + document.getElementById("usrname").value + "&" + 'password=' + document.getElementById("psw").value);
+	        	//xhr.send('password=' + document.getElementById("psw").value);
+				}
+
+
+
 		    console.log('onSignIn complete');
 		}
 		function signOut() {
@@ -66,10 +97,11 @@
 		    auth2.signOut().then(function () {
 		      console.log('User signed out.');
 				document.getElementById("signOutButton").disabled = true;
+				document.getElementById("signInButton").disabled = false;
+
 
 		    });
 		}
 	</script>
-
 </body>
 </html>
