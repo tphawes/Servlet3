@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<meta name="google-signin-scope" content="profile email">
+<meta name="google-signin-client_id"
+	content="37858416227-7ogd24in3t5of5o5ugqkpefhvehjbbgi.apps.googleusercontent.com">
+	<script src="https://apis.google.com/js/platform.js" defer></script>
+<link rel="shortcut icon" href="">
+
+
+
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>The button Element</h1>
+	<button type="button" onclick="alert('Hello world!')">Click
+		Me!</button>
+	<p id="demo"></p>
+	<button type="button" name="b2" onclick="myFunction2(3, 3)">Click
+		Me!</button>
+	<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" data-longtitle="true"></div>
+	<button type="button" id="signOutButton" onclick="signOut()" disabled>Sign Out</button>
+
+
+
+
+
+	<script>
+		function myFunction(p1, p2) {
+			return p1 * p2;
+		}
+		function myFunction2(p1, p2) {
+			document.getElementById("demo").innerHTML = myFunction(p1, p2);
+		}
+		function onSignIn(googleUser) {
+			// Useful data for your client-side scripts:
+			var profile = googleUser.getBasicProfile();
+			console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+			console.log('Full Name: ' + profile.getName());
+			console.log('Given Name: ' + profile.getGivenName());
+			console.log('Family Name: ' + profile.getFamilyName());
+			console.log("Image URL: " + profile.getImageUrl());
+			console.log("Email: " + profile.getEmail());
+
+			// The ID token you need to pass to your backend:
+			var id_token = googleUser.getAuthResponse().id_token;
+			console.log("ID Token: " + id_token);
+			document.getElementById("signOutButton").disabled = false;
+
+			var xhr = new XMLHttpRequest();
+        	xhr.open('POST', 'GoogleAuth');
+        	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        	xhr.onload = function() {
+        		console.log('Signed in as: ' + xhr.responseText + ":");  
+        	};
+        	xhr.send('id_token=' + id_token);
+		    console.log('onSignIn complete');
+		}
+		function signOut() {
+		    var auth2 = gapi.auth2.getAuthInstance();
+		    auth2.signOut().then(function () {
+		      console.log('User signed out.');
+				document.getElementById("signOutButton").disabled = true;
+
+		    });
+		}
+	</script>
+</body>
+</html>
