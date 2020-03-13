@@ -47,7 +47,7 @@ public class GoogleAuth extends HttpServlet {
 
         System.out.println("GoogleLoginServlet start");
         //response.setContentType("text/html");
-
+        String returnVal = "";
         
         
         try {
@@ -57,7 +57,7 @@ public class GoogleAuth extends HttpServlet {
             String email = payLoad.getEmail();
             System.out.println("User name: " + name);
             System.out.println("User email: " + email);
-    		String returnVal="";
+    		returnVal= payLoad.getEmail();
 
             //Verify the token
             
@@ -71,13 +71,12 @@ public class GoogleAuth extends HttpServlet {
     					GoogleIdToken verifiedToken = verifier.verify(idToken);
     					if (verifiedToken != null) {
     						Payload payload = verifiedToken.getPayload();
-    						returnVal = "User ID: " + payload.getSubject();
-    						System.out.println("Verified");
+    						System.out.println("Verified:" + returnVal);
     						// You can also access the following properties of the payload in order
     						// for other attributes of the user. Note that these fields are only
     						// available if the user has granted the 'profile' and 'email' OAuth
     						// scopes when requested.
-    						// String email = payload.getEmail();
+    						//  String email = payload.getEmail();
     						// boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
     						// String name = (String) payload.get("name");
     						// String pictureUrl = (String) payload.get("picture");
@@ -94,30 +93,24 @@ public class GoogleAuth extends HttpServlet {
     		}
     		try {
     			HttpSession session = request.getSession(true);
-    			System.out.println("Session creation:" + session.getCreationTime());
-    			
-    			System.out.println("Session creation:" + session.getId());
-                session.setAttribute("userName", returnVal);
+    			System.out.println("Session creation time:" + session.getCreationTime());
+    			System.out.println("Session creation id:" + session.getId());
+    			returnVal+= ":" + session.getId();
+                session.setAttribute("userName", email);
     		}
     		catch(Exception e){
     			e.printStackTrace();
     		}
-    		
-    		
-    		//request.getServletContext()
-            //   .getRequestDispatcher("/followup.jsp").forward(request, response);
     		//Just return a string
     		response.setHeader("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
     		response.setContentType("text/plain;charset=UTF-8");
             ServletOutputStream sout = response.getOutputStream();
             sout.print(returnVal);
             //End verify token
-
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        System.out.println("GoogleLoginServlet complete");
+        System.out.println("GoogleLoginServlet complete:" + returnVal);
 /*        
         GoogleCredential credential = OAuthSession.getInstance().createCredential(request);
         System.out.println("GoogleLoginServlet 1");

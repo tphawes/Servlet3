@@ -46,76 +46,19 @@ public class UserDataAuth extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         System.out.println("UserDataAuth start");
-        //response.setContentType("text/html");
-		String returnVal="Something";
-        String name = request.getParameter("username");
+        String username = request.getParameter("username");
         String password = request.getParameter("password");
-        System.out.println("User name:" + request.getParameterValues("password")[0] );
-        System.out.println("User name: " + name);
+        System.out.println("User name: " + username);
         System.out.println("User password: " + password);
-/*
-        try {
-
-
-            //Verify the token
-            
-    		try {
-    			HttpSession session = request.getSession(true);
-    			System.out.println("Session creation:" + session.getCreationTime());
-    			
-    			System.out.println("Session creation:" + session.getId());
-                session.setAttribute("userName", returnVal);
-    		}
-    		catch(Exception e){
-    			e.printStackTrace();
-    		}
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-	*/
+		HttpSession session = request.getSession(true);
+		System.out.println("Session creation:" + session.getCreationTime());
+		System.out.println("Session creation:" + session.getId());
+		String returnVal=username + ":" + session.getId();
+        session.setAttribute("userName", username);
 		response.setContentType("text/plain;charset=UTF-8");
         ServletOutputStream sout = response.getOutputStream();
         sout.print(returnVal);
-        System.out.println("GoogleLoginServlet complete");
-/*        
-        GoogleCredential credential = OAuthSession.getInstance().createCredential(request);
-        System.out.println("GoogleLoginServlet 1");
-        String userId = OAuthSession.getInstance().getUserId(request);
-        System.out.println("GoogleLoginServlet 2");
-        // Get userInfo
-        Oauth2 oauth2 = new Oauth2.Builder(
-                new com.google.api.client.http.javanet.NetHttpTransport(),
-                new com.google.api.client.json.jackson2.JacksonFactory(),
-                credential).build();
-        System.out.println("GoogleLoginServlet 3");
-        // Get userInfo
-        Userinfoplus userInfo = oauth2.userinfo().get().execute();
-        System.out.println("GoogleLoginServlet 4");
-        System.out.println("userId:" + userId );
-        System.out.println("userInfo:" + userInfo );
-        
-		String user = request.getParameter("username");
-		String pwd = request.getParameter("password");
-		
-		String idToken = request.getParameter("id_token");
-		if( idToken != null )
-		{
-	        System.out.println("Got token");
-	        GoogleIdToken.Payload payLoad;
-		}
-        System.out.println("Hello:" + user );
-        System.out.println("Hello:" + pwd );
-    	Cookie loginCookie = new Cookie("user","user");
-		//setting cookie to expiry in 30 mins
-		loginCookie.setMaxAge(30*60);
-		response.addCookie(loginCookie);
-        String question = "How are you?";
-        List<String> questions = new ArrayList<String>();
-        questions.add(question);
-        request.setAttribute("questions", questions);
-        RequestDispatcher view = request.getRequestDispatcher("followup.jsp");
-        System.out.println("GoogleLoginServlet complete");
-        view.forward(request, response);
-        */
+        System.out.println("UserDataAuth complete:" + returnVal);
+
     }
 }
