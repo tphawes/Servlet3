@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -29,6 +30,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
 
+import DB.DBConnectionManager;
 import Session.SessionManager;
 import auth.IdTokenVerifierAndParser;
 
@@ -53,6 +55,7 @@ public class GoogleAuth extends HttpServlet {
         
         try {
             String idToken = request.getParameter("id_token");
+            //Verify the token
             GoogleIdToken.Payload payLoad = IdTokenVerifierAndParser.getPayload(idToken);
             String name = (String) payLoad.get("name");
             String email = payLoad.getEmail();
@@ -60,8 +63,7 @@ public class GoogleAuth extends HttpServlet {
             System.out.println("User email: " + email);
     		returnVal= payLoad.getEmail();
 
-            //Verify the token
-            
+/*            
     		if(idToken != null && !idToken.equals(""))
     		{
     			System.out.println("Verify");
@@ -92,13 +94,17 @@ public class GoogleAuth extends HttpServlet {
     					returnVal = ex.getMessage();
     				}
     		}
+    		*/
     		try {
-    			HttpSession session = request.getSession(true);
-    			System.out.println("Session creation time:" + session.getCreationTime());
-    			System.out.println("Session creation id:" + session.getId());
+    			ServletContext ctx = request.getServletContext();
+    	    	DBConnectionManager dbManager = (DBConnectionManager) ctx.getAttribute("DBManager");
+    	    	
+				int userId = dbManager.getUserID(email);
+				HttpSession session = request.getSession();
+				session.setAttribute("userId", userId);
+				dbManager.insertSession(userId, request.getSession().getId());
     			returnVal+= ":" + session.getId();
-                session.setAttribute("userName", email);
-				SessionManager.createSession(email, session.getId());
+				session.setAttribute("userId", userId);
     		}
     		catch(Exception e){
     			e.printStackTrace();

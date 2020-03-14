@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -35,6 +36,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
 
+import DB.DBConnectionManager;
 import DB.DatabaseConnection;
 import Session.SessionManager;
 import auth.IdTokenVerifierAndParser;
@@ -57,30 +59,12 @@ public class ProcessAnswer extends HttpServlet {
 		String returnVal = "We may need to look a little deeper";
 		// DB Stuff
 		try {
-			Connection con = DatabaseConnection.initializeDatabase();
-			if (!con.isClosed()) {
-				System.out.println("DB Connection is open");
-				String sessionId = DatabaseConnection.getSessionID(request.getSession(true).getId(), con);
-				PreparedStatement pstmt;
-				Timestamp currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-				//insert into response_data (session_id, response_data, create_date) values(1, 'I feel horrible', NOW());
-				pstmt = con.prepareStatement("insert into demoprj.response_data (session_id, response_data, create_date) values (?, ?, ?)");
-				// Create a PreparedStatement object 1
-				pstmt.setString(1, sessionId); // Assign value to input parameter 2
-				pstmt.setString(2, userAnswer); // Assign value to input parameter 2
-				pstmt.setTimestamp(3, currentTimestamp);
-				boolean rs = pstmt.execute();
-				if (rs) 
-				{ // Position the cursor 4
-					System.out.println("Completed insert");				
-				}
-				pstmt.close();
-				con.close();
-				System.out.println("DB Connection is closed");
-			}
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServletContext ctx = request.getServletContext();
+	    	DBConnectionManager dbManager = (DBConnectionManager) ctx.getAttribute("DBManager");
+	    	//Need userID to get previous answers
+			int userId = (int) request.getSession().getAttribute("userId");
+			List<String> responseList = dbManager.getPreviousUserResponses(userId);
+	    	dbManager.insertResponse(dbManager.getSessionID(request.getSession().getId()), userAnswer);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

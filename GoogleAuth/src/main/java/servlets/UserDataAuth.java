@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -33,6 +34,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
 
+import DB.DBConnectionManager;
 import DB.DatabaseConnection;
 import Session.SessionManager;
 import auth.IdTokenVerifierAndParser;
@@ -48,38 +50,43 @@ public class UserDataAuth extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		System.out.println("UserDataAuth start");
+		ServletContext ctx = request.getServletContext();
+    	DBConnectionManager dbManager = (DBConnectionManager) ctx.getAttribute("DBManager");
+		try {
+			System.out.println("DB:" + dbManager.getConnection().isClosed());
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		System.out.println("User name: " + username);
 		System.out.println("User password: " + password);
 		String returnVal = "";
 		String UNKNOWNUSER = "UNKNOWNUSER";
-
 		// DB Stuff
 		try {
-			Connection con = DatabaseConnection.initializeDatabase();
+			Connection con = dbManager.getConnection();
+
 			if (!con.isClosed()) {
 				System.out.println("DB Connection is open");
-				if ( DatabaseConnection.getUser(username, password, con)) {
-					System.out.println("validUser");
-					HttpSession session = request.getSession(true);
-					System.out.println("Session creation:" + session.getCreationTime());
-					System.out.println("Session creation:" + session.getId());
-					returnVal = username + ":" + session.getId();
-					session.setAttribute("userName", username);
-					SessionManager.createSession(username, session.getId());
-				} else {
+				int userId = dbManager.getUserID(username, password);
+				HttpSession session = request.getSession();
+				session.setAttribute("userId", userId);
+				dbManager.insertSession(userId, request.getSession().getId());
+				if ( userId > 0 ) 
+				{
+					System.out.println("Valid User:" + userId);
+					returnVal = userId + ":" + session.getId();
+				} else 
+				{
+					System.out.println("Invalid User:" + userId);
 					returnVal = UNKNOWNUSER;
 				}
-				con.close();
 				System.out.println("DB Connection is closed");
 			}
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
+		}  catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

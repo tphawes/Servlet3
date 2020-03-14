@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xmlns="https://java.sun.com/xml/ns/javaee" xsi:schemaLocation="https://java.sun.com/xml/ns/javaee https://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
-  <display-name>ServletListenerExample</display-name>
-  <session-config>
+  <display-name>MyMindfulHelper</display-name>
+    <session-config>
     <tracking-mode>COOKIE</tracking-mode>
 </session-config>
   <context-param>
     <param-name>DBUSER</param-name>
-    <param-value>pankaj</param-value>
+    <param-value>root</param-value>
   </context-param>
   <context-param>
     <param-name>DBPWD</param-name>
-    <param-value>password</param-value>
+    <param-value>Bwk802!</param-value>
   </context-param>
   <context-param>
     <param-name>DBURL</param-name>
-    <param-value>jdbc:mysql://localhost/mysql_db</param-value>
+    <param-value>jdbc:mysql://localhost:3306/demoprj</param-value>
+  </context-param>
+  <context-param>
+    <param-name>DBDRIVER</param-name>
+    <param-value>com.mysql.cj.jdbc.Driver</param-value>
   </context-param>
   
+
+   <listener>
+    <listener-class>Listeners.MySessionListener</listener-class>
+  </listener>
+    <listener>
+    <listener-class>Listeners.MyServletRequestListener</listener-class>
+  </listener>
   <listener>
-    <listener-class>servlets.MySpecialListener</listener-class>
+    <listener-class>Listeners.AppContextListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>Listeners.AppContextAttributeListener</listener-class>
   </listener>
 </web-app>
-
-<!--
-<?xml version="1.0" encoding="UTF-8"?>
-<session-config>
-    <tracking-mode>COOKIE</tracking-mode>
-</session-config>
--->
 
