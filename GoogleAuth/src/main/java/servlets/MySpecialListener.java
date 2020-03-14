@@ -1,5 +1,6 @@
 package servlets;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -23,26 +24,6 @@ public class MySpecialListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
         // On Application Shutdown, please…
     	System.out.println("Destroying Servlet");
-
-    	try {
-        // 1. Go fetch that DataSource
-        Context initContext = new InitialContext();
-        Context envContext  = (Context)initContext.lookup("java:/comp/env");
-        DataSource datasource = (DataSource)envContext.lookup("jdbc/database");
-
-        // 2. Deregister Driver
-
-            java.sql.Driver mySqlDriver = DriverManager.getDriver("jdbc:mysql://localhost:3306/");
-            DriverManager.deregisterDriver(mySqlDriver);
-            datasource = null;
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();;
-        } 
-    	 catch (Exception ex) {
-             ex.printStackTrace();;
-         }
-        // 3. For added safety, remove the reference to dataSource for GC to enjoy.
     }
 
 }

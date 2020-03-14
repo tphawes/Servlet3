@@ -5,8 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -53,24 +55,26 @@ public class ProcessAnswer extends HttpServlet {
 		String userAnswer = request.getParameter("userAnswer");
 		System.out.println("User userAnswer: " + userAnswer);
 		String returnVal = "We may need to look a little deeper";
-		String UNKNOWNUSER = "UNKNOWNUSER";
-/*
 		// DB Stuff
 		try {
 			Connection con = DatabaseConnection.initializeDatabase();
 			if (!con.isClosed()) {
 				System.out.println("DB Connection is open");
-				if ( DatabaseConnection.getUser(username, password, con)) {
-					System.out.println("validUser");
-					HttpSession session = request.getSession(true);
-					System.out.println("Session creation:" + session.getCreationTime());
-					System.out.println("Session creation:" + session.getId());
-					returnVal = username + ":" + session.getId();
-					session.setAttribute("userName", username);
-					SessionManager.createSession(username, session.getId());
-				} else {
-					returnVal = UNKNOWNUSER;
+				String sessionId = DatabaseConnection.getSessionID(request.getSession(true).getId(), con);
+				PreparedStatement pstmt;
+				Timestamp currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+				//insert into response_data (session_id, response_data, create_date) values(1, 'I feel horrible', NOW());
+				pstmt = con.prepareStatement("insert into demoprj.response_data (session_id, response_data, create_date) values (?, ?, ?)");
+				// Create a PreparedStatement object 1
+				pstmt.setString(1, sessionId); // Assign value to input parameter 2
+				pstmt.setString(2, userAnswer); // Assign value to input parameter 2
+				pstmt.setTimestamp(3, currentTimestamp);
+				boolean rs = pstmt.execute();
+				if (rs) 
+				{ // Position the cursor 4
+					System.out.println("Completed insert");				
 				}
+				pstmt.close();
 				con.close();
 				System.out.println("DB Connection is closed");
 			}
@@ -81,7 +85,6 @@ public class ProcessAnswer extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-*/
 		// End DB stuff
 		response.setContentType("text/plain;charset=UTF-8");
 		ServletOutputStream sout = response.getOutputStream();

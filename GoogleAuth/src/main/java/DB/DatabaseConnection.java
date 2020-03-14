@@ -62,4 +62,19 @@ public class DatabaseConnection {
 		pstmt.close();
 		return retVal;
 	}
+    public static String getSessionID(String sessionIDIn, Connection con) throws SQLException {
+		PreparedStatement pstmt;
+		ResultSet rs;
+		String retVal = "";
+		pstmt = con.prepareStatement("SELECT id FROM demoprj.session_tracker WHERE session_id=?");
+		// Create a PreparedStatement object 1
+		pstmt.setString(1, sessionIDIn); // Assign value to input parameter 2
+		rs = pstmt.executeQuery(); // Get the result table from the query 3
+		if (rs.next()) { 
+			retVal = rs.getString(1);// Position the cursor
+		}
+		rs.close(); // Close the ResultSet 5
+		pstmt.close();
+		return retVal;
+	}
 } 
