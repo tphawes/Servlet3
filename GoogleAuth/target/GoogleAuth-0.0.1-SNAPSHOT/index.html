@@ -6,37 +6,72 @@
 <meta name="google-signin-client_id"
 	content="37858416227-7ogd24in3t5of5o5ugqkpefhvehjbbgi.apps.googleusercontent.com">
 	<script src="https://apis.google.com/js/platform.js" defer></script>
-<link rel="shortcut icon" href="~/favicon.ico">>
+<link rel="shortcut icon" href="~/favicon.ico">
 
 
 
-<title>Insert title here</title>
+<title>My Mindful Helper</title>
 </head>
 <body>
-	<h1>The button Element</h1>
+	<h1>My Mindful Helper</h1>
 	<button type="button" onclick="alert('Hello world!')">Click
 		Me!</button>
 	<p id="demo"></p>
 	<button type="button" name="b2" onclick="myFunction2(3, 3)">Click
 		Me!</button>
-	<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" data-longtitle="true"></div>
+
+	<p id="p1">Please begin session by logging in</p>
+	<textarea id="dialogArea" rows="4" cols="50" onclick=clearDialog() oninput="monitorInput()" disabled></textarea>
+	<br>
+	<p id="demo"></p>
+	<br>
+	<button type="button" id="processAnswer" name="processAnswer" onclick="myFunction2(3, 3)" disabled>Submit Answer</button>
+	<br><br>
+	
+
+	<div id="googleButton" class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" data-longtitle="true"></div>
+	<br>
+   <input type="text" id="usrname" name="usrname" value="user1" required>
+   <br>
+    <input type="password" id="psw" name="psw" value="pswd1" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>
+	<br>
+	<button type="button" id="signInButton" onclick="onSignIn2()" >Sign in with ID and PSWD</button>
+	<br><br>
+	
 	<button type="button" id="signOutButton" onclick="signOut()" disabled>Sign Out</button>
 	<br>
-   <label for="usrname">Username</label>
-    <input type="text" id="usrname" name="usrname" required>
-    <label for="psw">Password</label>
-    <input type="password" id="psw" name="psw" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>
-	<button type="button" id="signInButton" onclick="onSignIn2()" >Sign In</button>
 
 
 
 	<script>
+		document.addEventListener("click", function(){
+		  //document.getElementById("dialogArea").innerHTML = "Hello World";
+		});
 		function myFunction(p1, p2) {
 			return p1 * p2;
 		}
 		function myFunction2(p1, p2) {
 			document.getElementById("demo").innerHTML = myFunction(p1, p2);
 		}
+		function clearDialog() {
+			document.getElementById("dialogArea").innerHTML = "";			
+		}
+		function monitorInput() {
+			var lmt = 20;
+			var x = document.getElementById("dialogArea").value;
+			var dialogLength = document.getElementById("dialogArea").value.length;
+			console.log('chars: ' + dialogLength);
+			if( dialogLength >= 1 )
+			{
+				document.getElementById("processAnswer").disabled = false;
+			}
+			if( dialogLength > lmt )
+			{
+			   alert("Input cannot exceed " + lmt);
+			   document.getElementById("dialogArea").value = document.getElementById("dialogArea").value.substr(0,lmt);
+			}
+		}
+
 		function onSignIn(googleUser) {
 			// Useful data for your client-side scripts:
 			var profile = googleUser.getBasicProfile();
@@ -51,6 +86,7 @@
 			var id_token = googleUser.getAuthResponse().id_token;
 			console.log("ID Token: " + id_token);
 			document.getElementById("signOutButton").disabled = false;
+			document.getElementById("signInButton").disabled = true;
 
 			var xhr = new XMLHttpRequest();
         	xhr.open('POST', 'GoogleAuth');
@@ -59,38 +95,42 @@
         	//	console.log('Signed in as: ' + xhr.responseText + ":");  
         	//};
         	xhr.send('id_token=' + id_token);
+		    signedIn();
 		    console.log('onSignIn complete');
 		}
-		function onSignIn2() {
+		function onSignIn2() 
+		{
 			// Useful data for your client-side scripts:
 			console.log("usrname: " + document.getElementById("usrname").value);
 			console.log("psw: " + document.getElementById("psw").value);
 			if( document.getElementById("psw").value == "" )
-				{
+			{
 				alert("Must enter a password");
-				}
+			}
 			else if( document.getElementById("usrname").value == "" )
-				{
+			{
 				alert("Must enter a usrname");
-				}
+			}
 			else
-				{
-				document.getElementById("signOutButton").disabled = false;
-				document.getElementById("signInButton").disabled = true;
-
+			{
 				var xhr = new XMLHttpRequest();
 	        	xhr.open('POST', 'UserDataAuth');
 	        	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	        	xhr.onload = function() {
-	        		console.log('Signed in as: ' + xhr.responseText + ":");  
+	        		console.log('Signed in as: ' + xhr.responseText + ":");
+	        		if( xhr.responseText == "UNKNOWNUSER")
+        			{
+		        		alert("Must enter a valid user name and password");
+		        		return;
+        			}
 	        	};
 	        	xhr.send('username=' + document.getElementById("usrname").value + "&" + 'password=' + document.getElementById("psw").value);
 	        	//xhr.send('password=' + document.getElementById("psw").value);
-				}
-
-
-
+			}
+			document.getElementById("signOutButton").disabled = false;
+			document.getElementById("signInButton").disabled = true;
 		    console.log('onSignIn complete');
+		    signedIn();
 		}
 		function signOut() {
 		    var auth2 = gapi.auth2.getAuthInstance();
@@ -98,9 +138,34 @@
 		      console.log('User signed out.');
 				document.getElementById("signOutButton").disabled = true;
 				document.getElementById("signInButton").disabled = false;
-
+				document.getElementById("googleButton").style.display = "block";
+				document.getElementById("usrname").style.display = "block";
+				document.getElementById("psw").style.display = "block";
+				document.getElementById("signInButton").style.display = "block";
 
 		    });
+			var xhr = new XMLHttpRequest();
+        	xhr.open('POST', 'LogoutServlet');
+        	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        	xhr.onload = function() {
+        		console.log('Signed out: ' + xhr.responseText + ":");
+        	};
+		}
+		function signedIn()
+		{
+			document.getElementById("signOutButton").disabled = false;
+			document.getElementById("signInButton").disabled = true;
+			document.getElementById("googleButton").disabled = true;
+			document.getElementById("googleButton").style.display = "none";
+			document.getElementById("signInButton").style.display = "none";
+			 
+			document.getElementById("usrname").style.display = "none";
+			document.getElementById("psw").style.display = "none";
+
+			
+			document.getElementById("p1").innerHTML = "How are you today?";		
+			document.getElementById("dialogArea").innerHTML = "Please type your answer in this box";			
+			document.getElementById("dialogArea").disabled = false;
 		}
 	</script>
 </body>

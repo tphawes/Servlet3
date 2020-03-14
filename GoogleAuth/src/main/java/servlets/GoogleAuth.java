@@ -29,6 +29,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
 
+import Session.SessionManager;
 import auth.IdTokenVerifierAndParser;
 
 @WebServlet(
@@ -97,6 +98,7 @@ public class GoogleAuth extends HttpServlet {
     			System.out.println("Session creation id:" + session.getId());
     			returnVal+= ":" + session.getId();
                 session.setAttribute("userName", email);
+				SessionManager.createSession(email, session.getId());
     		}
     		catch(Exception e){
     			e.printStackTrace();
