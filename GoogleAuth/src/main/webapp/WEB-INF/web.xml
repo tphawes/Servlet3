@@ -13,12 +13,36 @@
     <param-value>Bwk802!</param-value>
   </context-param>
   <context-param>
+    <param-name>DBSCHEMA</param-name>
+    <param-value>demoprj</param-value>
+  </context-param>
+  <context-param>
     <param-name>DBURL</param-name>
-    <param-value>jdbc:mysql://localhost:3306/demoprj</param-value>
+    <param-value>jdbc:mysql://localhost:3306/</param-value>
   </context-param>
   <context-param>
     <param-name>DBDRIVER</param-name>
     <param-value>com.mysql.cj.jdbc.Driver</param-value>
+  </context-param>
+  <context-param>
+    <param-name>DIALOGTABLENAME</param-name>
+    <param-value>dialog_data</param-value>
+  </context-param>
+  <context-param>
+    <param-name>SESSIONTRACKERTABLENAME</param-name>
+    <param-value>session_tracker</param-value>
+  </context-param>
+  <context-param>
+    <param-name>USERDATATABLENAME</param-name>
+    <param-value>user_data</param-value>
+  </context-param>
+  <context-param>
+    <param-name>QUESTIONDATATABLENAME</param-name>
+    <param-value>question_data</param-value>
+  </context-param>
+  <context-param>
+    <param-name>SESSIONTIMEOUT</param-name>
+    <param-value>60</param-value>
   </context-param>
   
 

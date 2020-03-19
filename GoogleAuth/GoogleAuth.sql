@@ -27,11 +27,10 @@ insert into user_data (user_name, pswd, create_date) values('tom.hawes.gm@gmail.
 select * from user_data;
 
 CREATE TABLE `session_tracker` (
-`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
-`session_id` varchar(40) NULL ,
+`session_id` varchar(40) NOT NULL ,
 `user_id` BIGINT NOT NULL ,
 create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`session_id`)
 );
 
 insert into session_tracker (session_id, user_id, create_date) values('sdad', 8, NOW());
@@ -39,15 +38,30 @@ select * from session_tracker;
 delete from session_tracker where id > 0;
 drop table session_tracker;
 
-CREATE TABLE `response_data` (
+CREATE TABLE `dialog_data` (
 `response_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
-`session_id` varchar(40) NOT NULL ,
-`response_data` varchar(260) NOT NULL ,
+`session_id` BIGINT NOT NULL ,
+`response_string` varchar(260) NOT NULL ,
+`question_string` varchar(260) NOT NULL ,
 create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (`response_id`)
 );
-select * from response_data;
-delete from response_data where response_id > 0;
-insert into response_data (session_id, response_data, create_date) values(1, 'I feel horrible', NOW());
+select * from dialog_data;
+delete from dialog_data where response_id > 0;
+insert into dialog_data (session_id, response_string, create_date) values(1, 'I feel horrible', NOW());
+drop table dialog_data;
+select response_string from dialog_data where session_id in
+(
+select id from session_tracker where user_id = 1
+);
 
-drop table response_data;
+select id from session_tracker where user_id = 1;
+
+CREATE TABLE `question_data` (
+`question_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+`session_id` BIGINT NOT NULL ,
+`question_string` varchar(260) NOT NULL ,
+create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (`question_id`)
+);
+drop table question_data;

@@ -36,6 +36,7 @@ import com.google.api.services.oauth2.model.Userinfoplus;
 
 import DB.DBConnectionManager;
 import DB.DatabaseConnection;
+import Model.SessionData;
 import Session.SessionManager;
 import auth.IdTokenVerifierAndParser;
 
@@ -74,7 +75,8 @@ public class UserDataAuth extends HttpServlet {
 				int userId = dbManager.getUserID(username, password);
 				HttpSession session = request.getSession();
 				session.setAttribute("userId", userId);
-				dbManager.insertSession(userId, request.getSession().getId());
+				SessionData sd = (SessionData) session.getAttribute("sessionDataObject");
+				sd.updateSession(userId, request.getSession().getId(), ctx);
 				if ( userId > 0 ) 
 				{
 					System.out.println("Valid User:" + userId);

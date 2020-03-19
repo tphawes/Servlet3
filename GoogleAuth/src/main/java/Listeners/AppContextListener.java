@@ -14,14 +14,8 @@ public class AppContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     	ServletContext ctx = servletContextEvent.getServletContext();
     	
-    	String url = ctx.getInitParameter("DBURL");
-    	String u = ctx.getInitParameter("DBUSER");
-    	String p = ctx.getInitParameter("DBPWD");
-    	String d = ctx.getInitParameter("DBDRIVER");
-
-    	
     	//create database connection from init parameters and set it to context
-    	DBConnectionManager dbManager = new DBConnectionManager(url, u, p, d);
+    	DBConnectionManager dbManager = new DBConnectionManager( ctx );
     	ctx.setAttribute("DBManager", dbManager);
     	System.out.println("Database connection initialized for Application.");
     }

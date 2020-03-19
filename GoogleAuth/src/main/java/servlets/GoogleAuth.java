@@ -31,6 +31,7 @@ import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
 
 import DB.DBConnectionManager;
+import Model.SessionData;
 import Session.SessionManager;
 import auth.IdTokenVerifierAndParser;
 
@@ -98,13 +99,11 @@ public class GoogleAuth extends HttpServlet {
     		try {
     			ServletContext ctx = request.getServletContext();
     	    	DBConnectionManager dbManager = (DBConnectionManager) ctx.getAttribute("DBManager");
-    	    	
 				int userId = dbManager.getUserID(email);
 				HttpSession session = request.getSession();
-				session.setAttribute("userId", userId);
-				dbManager.insertSession(userId, request.getSession().getId());
+				SessionData sd = (SessionData) session.getAttribute("sessionDataObject");
+				sd.updateSession(userId, request.getSession().getId(), ctx);
     			returnVal+= ":" + session.getId();
-				session.setAttribute("userId", userId);
     		}
     		catch(Exception e){
     			e.printStackTrace();
@@ -119,6 +118,7 @@ public class GoogleAuth extends HttpServlet {
             throw new RuntimeException(e);
         }
         System.out.println("GoogleLoginServlet complete:" + returnVal);
+        
 /*        
         GoogleCredential credential = OAuthSession.getInstance().createCredential(request);
         System.out.println("GoogleLoginServlet 1");

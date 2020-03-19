@@ -16,7 +16,7 @@
 	<h1>My Mindful Helper</h1>
 	<p id="demo"></p>
 	<br>
-	<p id="p1">Please begin session by logging in</p>
+	<p id="questionForUser">Please begin session by logging in</p>
 	<textarea id="dialogArea" rows="4" cols="50" onclick=clearDialog() onkeypress="monitorInput(event, this)" disabled></textarea>
 	<br>
 	<button type="button" id="processAnswer" name="processAnswer" onclick="processAnswer()" disabled>Submit Answer</button>
@@ -35,6 +35,7 @@
 	<button type="button" id="signOutButton" onclick="signOut()" disabled>Sign Out</button>
 	<br>
 	<input type="hidden" id="userAnswer" name="userAnswer" value="">
+	<input type="hidden" id="userQuestion" name="userQuestion" value="">
 
 
 
@@ -45,17 +46,21 @@
 		function nextQuestion(nq) {
 			var millisecondsToWait = 3000;
 			setTimeout(function() {			
-				document.getElementById("p1").innerHTML = nq;
+				document.getElementById("questionForUser").innerHTML = nq;
 			}, millisecondsToWait);
 		}
 		function processAnswer() {
 			var userAnswer = document.getElementById("dialogArea").value;
+			var userQuestion = document.getElementById("questionForUser").innerHTML;
 			console.log('Process the answer:' + userAnswer);
+			console.log('Process the question:' + userQuestion);
+
 			document.getElementById("userAnswer").value = userAnswer;
+			document.getElementById("userQuestion").value = userQuestion;
 			document.getElementById("dialogArea").value = "";
 			document.getElementById("dialogArea").disabled = true;
 			document.getElementById("demo").innerHTML = 'You answered:' + userAnswer;
-			document.getElementById("p1").innerHTML = "Please let me consider your answer.";
+			document.getElementById("questionForUser").innerHTML = "Please let me consider your answer.";
 			var xhr = new XMLHttpRequest();
         	xhr.open('POST', 'ProcessAnswer');
         	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -63,8 +68,10 @@
         		console.log('Answered: ' + xhr.responseText + ":");
         		nextQuestion(xhr.responseText);
         	};
-        	xhr.send('userAnswer=' + userAnswer);
+        	xhr.send('userAnswer=' + userAnswer + '&' + 'userQuestion=' + userQuestion);
+
         	console.log('Processed the answer:' + xhr.responseText);
+
         }
 		function clearDialog() {
 			document.getElementById("dialogArea").innerHTML = "";			
@@ -147,7 +154,6 @@
         			}
 	        	};
 	        	xhr.send('username=' + document.getElementById("usrname").value + "&" + 'password=' + document.getElementById("psw").value);
-	        	//xhr.send('password=' + document.getElementById("psw").value);
 			}
 			document.getElementById("signOutButton").disabled = false;
 			document.getElementById("signInButton").disabled = true;
@@ -155,9 +161,10 @@
 		    signedIn();
 		}
 		function signOut() {
+			console.log('User signing out.');
 		    var auth2 = gapi.auth2.getAuthInstance();
 		    auth2.signOut().then(function () {
-		      console.log('User signed out.');
+		      console.log('GoogleUser signed out.');
 				document.getElementById("signOutButton").disabled = true;
 				document.getElementById("signInButton").disabled = false;
 				document.getElementById("googleButton").style.display = "block";
@@ -173,7 +180,7 @@
         		console.log('Signed out: ' + xhr.responseText + ":");
         	};
         	xhr.send();
-
+        	console.log('User completed signing out.');
 		}
 		function signedIn()
 		{
@@ -184,10 +191,22 @@
 			document.getElementById("signInButton").style.display = "none";
 			document.getElementById("usrname").style.display = "none";
 			document.getElementById("psw").style.display = "none";
-			document.getElementById("p1").innerHTML = "How are you today?";		
+			document.getElementById("questionForUser").innerHTML = "How are you today?";		
 			document.getElementById("dialogArea").innerHTML = "Please type your answer in this box.  When complete press enter, or select the Submit Answer button below.";			
 			document.getElementById("dialogArea").disabled = false;
 		}
+		window.onbeforeunload = function (e) 
+		{
+		    var e = e || window.event;
+		    signOut();
+		    console.log('leaving the page');
+		    // For IE and Firefox
+		    if (e) {
+		        e.returnValue = 'Leaving the page';
+		    }
+		    // For Safari
+		    return 'Leaving the page';
+		};
 	</script>
 </body>
 </html>
